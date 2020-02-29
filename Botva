@@ -1,0 +1,69 @@
+#include <iostream>
+#include <queue>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <utility>
+#include <fstream>
+#include <set>
+#include <map>
+#include <list>
+#include <deque>
+
+using namespace std;
+
+int main() {
+    int n, k, z;
+    queue<int> a, b;
+    for (int i = 0; i < 5; i++) {
+        cin >> n;
+        a.push(n);
+    }
+    for (int i = 0; i < 5; i++) {
+        cin >> n;
+        b.push(n);
+    }
+    int i = 0;
+    while (a.size() != 0 && b.size() != 0 && i < 1000001) {
+        if (a.front() == 0 && b.front() == 9) {
+            a.pop();
+            b.pop();
+            a.push(0);
+            a.push(9);
+        }
+        else if (b.front() == 0 && a.front() == 9) {
+            a.pop();
+            b.pop();
+            b.push(9);
+            b.push(0);
+        }
+        else {
+            if (a.front() > b.front()) {
+                z = b.front();
+                k = a.front();
+                a.pop();
+                b.pop();
+                a.push(k);
+                a.push(z);
+            }
+            else {
+                z = b.front();
+                k = a.front();
+                a.pop();
+                b.pop();
+                b.push(k);
+                b.push(z);
+            }
+        }
+        i++;
+    }
+    if (a.size() == 0) {
+        cout << "second " << i;
+    }
+    else if (b.size() == 0) {
+        cout << "first " << i;
+    }
+    else {
+        cout << "botva";
+    }
+}
