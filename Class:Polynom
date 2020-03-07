@@ -1,0 +1,313 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+template<typename T>
+class Polynomial {
+private:
+    std::vector<T> cf;
+
+public:
+    template <class Iter>
+    Polynomial(Iter begin, Iter end) {
+        if (begin != end) {
+            bool nnul = 0;
+            auto it = end;
+            if (it != begin)
+                --it;
+            for (; it != begin; --it) {
+                if (nnul || *it != T(0)) {
+                    nnul = 1;
+                    cf.push_back(*it);
+                }
+            }
+            if (nnul || *begin != T(0))
+                cf.push_back(*begin);
+            std::reverse(std::begin(cf), std::end(cf));
+        }
+    }
+    Polynomial(std::vector<T> c) {
+        Polynomial<T> d(c.begin(), c.end());
+        cf = d.cf;
+    }
+    Polynomial(T a, int i) {
+        cf.resize(i + 1);
+        cf[i] = a;
+    }
+    Polynomial(T a) {
+        if (a != T(0))
+            cf = { a };
+    }
+    Polynomial() {}
+    Polynomial(const Polynomial& a) {
+        cf = a.cf;
+    }
+    Polynomial(Polynomial&& a) {
+        cf = a.cf;
+    }
+    Polynomial operator = (const Polynomial& a) {
+        cf = a.cf;
+        return *this;
+    }
+    Polynomial operator = (Polynomial&& a) {
+        cf = a.cf;
+        return *this;
+    }
+    Polynomial operator + (const Polynomial& a) const {
+        size_t i = 0;
+        T f, g;
+        std::vector<T> res;
+        while (i < a.cf.size() || i < cf.size()) {
+            f = T(0);
+            g = T(0);
+            if (i < a.cf.size())
+                f = a.cf[i];
+            if (i < cf.size())
+                g = cf[i];
+            res.push_back(f + g);
+            ++i;
+        }
+        return Polynomial(res);
+    }
+    Polynomial operator- () const {
+        Polynomial<T> b(*this);
+        for (size_t i = 0; i < b.cf.size(); i++) {
+            b.cf[i] = -b.cf[i];
+        }
+        return b;
+    }
+    Polynomial operator - (const Polynomial& a) const {
+        return *this + (-a);
+    }
+    Polynomial operator + (const T& a) const {
+        Polynomial<T> c(a);
+        return *this + c;
+    }
+    Polynomial operator - (const T& a) const {
+        Polynomial<T> c(a);
+        return *this - c;
+    }
+    Polynomial& operator+= (const Polynomial& a) {
+        *this = *this + a;
+        return *this;
+    }
+    Polynomial& operator-= (const Polynomial& a) {
+        *this = *this - a;
+        return *this;
+    }
+    Polynomial& operator+= (const T& a) {
+        *this = *this + a;
+        return *this;
+    }
+    Polynomial& operator-= (const T& a) {
+        *this = *this - a;
+        return *this;
+    }
+    bool operator== (const Polynomial& a) const {
+        return cf == a.cf;
+    }
+    bool operator!= (const Polynomial& a) const {
+        return cf != a.cf;
+    }
+    T operator[] (size_t i) const {
+        if (cf.size() > i)
+            return cf[i];
+        return T(0);
+    }
+    int Degree() const {
+        return cf.size() - 1;
+    }
+    auto begin() {
+        return cf.begin();
+    }
+    auto end() {
+        return cf.end();
+    }
+    auto begin() const {
+        return cf.begin();
+    }
+    auto end() const {
+        return cf.end();
+    }
+    T operator() (const T& a) const {
+        T b = T(0);
+        T ai = T(1);
+        for (size_t i = 0; i < cf.size(); ++i) {
+            b += cf[i] * ai;
+            ai *= a;
+        }
+        return b;
+    }
+    Polynomial operator * (const Polynomial& a) const {
+        std::vector<T> c(cf.size() + a.cf.size());
+        for (size_t i = 0; i < cf.size(); ++i)
+            for (size_t j = 0; j < a.cf.size(); ++j)
+                c[i + j] += cf[i] * a.cf[j];
+        return Polynomial(c);
+    }
+    Polynomial operator * (const T& a) const {
+        return *this * Polynomial(a);
+    }
+    Polynomial& operator *= (const T& a) {
+        *this = *this * Polynomial(a);
+        return *this;
+    }
+    Polynomial& operator *= (const Polynomial& a) {
+        *this = *this * a;
+        return *this;
+    }
+    Polynomial operator& (const Polynomial& a) const {
+        Polynomial<T> b;
+        Polynomial<T> ai = T(1);
+        for (size_t i = 0; i < cf.size(); ++i) {
+            b += cf[i] * ai;
+            ai *= a;
+        }
+        return b;
+    }
+    Polynomial operator / (const Polynomial& a) const {
+        Polynomial<T> b;
+        Polynomial<T> f = *this;
+        T g;
+        int j = f.Degree();
+        while (f.Degree() >= a.Degree() && f.Degree() > -1) {
+            j = f.Degree();
+            g = f.cf[f.cf.size() - 1] / a.cf[a.cf.size() - 1];
+            Polynomial<T> g1(g, f.Degree() - a.Degree());
+            f -= a * g1;
+            b += g1;
+            if (f.Degree() == j)
+                f.cf[f.cf.size() - 1] = 0;
+        }
+        return b;
+    }
+    Polynomial operator % (const Polynomial& a) const {
+        return *this - (*this / a * a);
+    }
+    Polynomial operator , (const Polynomial& b) const {
+        Polynomial<T> f = *this;
+        Polynomial<T> a = b;
+        while ((a.Degree() > -1) && (f.Degree() > -1)) {
+            a = a / Polynomial(a.cf[a.cf.size() - 1]);
+            f = f / Polynomial(f.cf[f.cf.size() - 1]);
+            if (a.Degree() > f.Degree()) {
+                a = a % f;
+            } else {
+                f = f % a;
+            }
+        }
+        if (a.Degree() > -1) {
+            return a;
+        } else {
+            return f;
+        }
+    }
+};
+template<typename T>
+Polynomial<T> operator * (const T& a, const Polynomial<T>& b) {
+    Polynomial<T> c(a);
+    return b * c;
+}
+template<typename T>
+Polynomial<T> operator + (const T& a, const Polynomial<T>& b) {
+    Polynomial<T> c(a);
+    return b + c;
+}
+template<typename T>
+Polynomial<T> operator - (const T& a, const Polynomial<T>& b) {
+    Polynomial<T> c(a);
+    return c - b;
+}
+template<typename T>
+std::ostream& operator<<(std::ostream& out, const Polynomial<T>& b) {
+    if (b.Degree() == -1) {
+        out << T(0);
+    } else {
+        int i = b.Degree();
+        if (i > 1) {
+            if (b[i] == T(1)) {
+                out << "x^" << i;
+            } else if (b[i] == T(-1)) {
+                out << "-x^" << i;
+            } else if (b[i] == T(0)) {
+            } else {
+                out << b[i] << "*x^" << i;
+            }
+            --i;
+            for (; i > 1; --i) {
+                if (b[i] == T(1)) {
+                    out << "+x^" << i;
+                } else if (b[i] == T(-1)) {
+                    out << "-x^" << i;
+                } else if (b[i] == T(0)) {
+                } else if (b[i] > T(0)) {
+                    out << "+" << b[i] << "*x^" << i;
+                } else if (b[i] < T(0)) {
+                    out << b[i] << "*x^" << i;
+                }
+            }
+            if (i == 1) {
+                if (b[i] == T(1)) {
+                    out << "+x";
+                } else if (b[i] == T(-1)) {
+                    out << "-x";
+                } else if (b[i] == T(0)) {
+                } else if (b[i] > T(0)) {
+                    out << "+" << b[i] << "*x";
+                } else if (b[i] < T(0)) {
+                    out << b[i] << "*x";
+                }
+                --i;
+            }
+            if (i == 0) {
+                if (b[i] == T(0)) {
+                } else if (b[i] > T(0)) {
+                    out << "+" << b[i];
+                } else if (b[i] < T(0)) {
+                    out << b[i];
+                }
+            }
+        } else if (i == 1) {
+            if (i == 1) {
+                if (b[i] == T(1)) {
+                    out << "x";
+                } else if (b[i] == T(-1)) {
+                    out << "-x";
+                } else if (b[i] == T(0)) {
+                } else if (b[i] > T(0)) {
+                    out << b[i] << "*x";
+                } else if (b[i] < T(0)) {
+                    out << b[i] << "*x";
+                }
+                --i;
+            }
+            if (i == 0) {
+                if (b[i] == T(0)) {
+                } else if (b[i] > T(0)) {
+                    out << "+" << b[i];
+                } else if (b[i] < T(0)) {
+                    out << b[i];
+                }
+            }
+        } else {
+            if (i == 0) {
+                if (b[i] == T(0)) {
+                } else if (b[i] > T(0)) {
+                    out << b[i];
+                } else if (b[i] < T(0)) {
+                    out << b[i];
+                }
+            }
+        }
+    }
+    return out;
+}
+
+using namespace std;
+template<typename T>
+void print(Polynomial<T> a) {
+    for (int i = 0; i <= a.Degree(); ++i) {
+        cout << a[i] << " ";
+    }
+    cout << "\n";
+}
