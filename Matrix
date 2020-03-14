@@ -1,0 +1,133 @@
+#include <iostream>
+#include <vector>
+#include <cassert>
+
+template<typename T>
+class Matrix {
+private:
+    std::vector<T> a;
+    size_t n, m;
+
+public:
+    Matrix(std::vector<std::vector<T>> b) {
+        n = b.size();
+        m = 0;
+        if (n > 0) {
+            m = b[0].size();
+        }
+        for (size_t i = 0; i < n; ++i) {
+            for (size_t j = 0; j < m; ++j) {
+                a.push_back(b[i][j]);
+            }
+        }
+    }
+    T operator[] (size_t i) const {
+        return a[i];
+    }
+    std::pair<size_t, size_t> size() const {
+        return { n, m };
+    }
+    Matrix<T> operator= (const Matrix<T>& b) {
+        a = b.a;
+        n = b.n;
+        m = b.m;
+        return *this;
+    }
+    Matrix<T> operator= (Matrix<T>&& b) {
+        a = b.a;
+        n = b.n;
+        m = b.m;
+        return *this;
+    }
+    Matrix<T>(const Matrix<T>& b) {
+        a = b.a;
+        n = b.n;
+        m = b.m;
+    }
+    Matrix<T>(Matrix<T>&& b) {
+        a = b.a;
+        n = b.n;
+        m = b.m;
+    }
+    Matrix<T> operator + (const Matrix& b) const {
+        Matrix<T> c = *this;
+        if (n == b.n && m == b.m) {
+            for (size_t i = 0; i < n; i++)
+                for (size_t j = 0; j < m; j++)
+                    c.a[i * m + j] = a[i * m + j] + b.a[i * m + j];
+        }
+        return c;
+    }
+    Matrix<T> operator+= (const Matrix& b) {
+        *this = *this + b;
+        return *this;
+    }
+    Matrix<T> operator * (int b) const {
+        Matrix<T> c = *this;
+        for (size_t i = 0; i < n; i++)
+            for (size_t j = 0; j < m; j++)
+                c.a[i * m + j] = a[i * m + j] * b;
+        return c;
+    }
+    Matrix<T> operator*= (int b) {
+        *this = *this * b;
+        return *this;
+    }
+    Matrix<T> operator * (const Matrix<T>& b) const {
+        std::vector<std::vector<T>> g(n, std::vector<T>(b.m));
+        Matrix<T> c(g);
+        assert(m == b.n);
+        for (size_t i = 0; i < n; ++i) {
+            for (size_t j = 0; j < b.m; ++j) {
+                for (size_t k = 0; k < m; ++k) {
+                    c.a[i * b.m + j] += a[i * m + k] * b.a[k * b.m + j];
+                }
+            }
+        }
+        return c;
+    }
+    Matrix<T> operator*= (const Matrix& b) {
+        *this = *this * b;
+        return *this;
+    }
+    Matrix<T> transposed() const {
+        std::vector<std::vector<T>> g(m, std::vector<T>(n));
+        Matrix<T> c(g);
+        for (size_t i = 0; i < n; i++)
+            for (size_t j = 0; j < m; j++)
+                c.a[j * n + i] = a[i * m + j];
+        return c;
+    }
+    Matrix<T> transpose() {
+        Matrix<T> c(*this);
+        *this = c.transposed();
+        return *this;
+    }
+    auto begin() const {
+        return a.begin();
+    }
+    auto end() const {
+        return a.end();
+    }
+    auto begin() {
+        return a.begin();
+    }
+    auto end() {
+        return a.end();
+    }
+};
+
+template<typename T>
+std::ostream& operator<<(std::ostream& out, const Matrix<T>& b) {
+    size_t n = b.size().first, m = b.size().second;
+    for (size_t i = 0; i < n; ++i) {
+        for (size_t j = 0; j < m; ++j) {
+            out << b[i * m + j];
+            if (j != m - 1)
+                out << "\t";
+        }
+        if (i != n - 1)
+            out << "\n";
+    }
+    return out;
+}
