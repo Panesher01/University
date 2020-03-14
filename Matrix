@@ -103,18 +103,6 @@ public:
         *this = c.transposed();
         return *this;
     }
-    auto begin() const {
-        return a.begin();
-    }
-    auto end() const {
-        return a.end();
-    }
-    auto begin() {
-        return a.begin();
-    }
-    auto end() {
-        return a.end();
-    }
 };
 
 template<typename T>
