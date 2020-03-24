@@ -302,12 +302,11 @@ std::ostream& operator<<(std::ostream& out, const Polynomial<T>& b) {
     }
     return out;
 }
-
-using namespace std;
-template<typename T>
-void print(Polynomial<T> a) {
-    for (int i = 0; i <= a.Degree(); ++i) {
-        cout << a[i] << " ";
-    }
-    cout << "\n";
-}
+/*
+Реализованы: 
+конструкторы,
+операции +, -, +=, -=, ==, !=, ,*, *=, /, %, НОД,(в том числе и с числами),
+(),[ ], Degree, begin, end,
+вывод через <<,
+оператор композиции &.
+*/
