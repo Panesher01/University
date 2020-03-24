@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-
+//Внизу добавлен комментарий к использованию(79 строка)
 template <typename T>
 class MathVector {
 private:
