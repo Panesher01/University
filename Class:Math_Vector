@@ -7,7 +7,6 @@ private:
     std::vector<T> data;
 
 public:
-    // Zero vector of size n
     MathVector(size_t n) {
         data.resize(n);
     }
@@ -76,3 +75,10 @@ MathVector<T> operator + (const MathVector<T>& v, const MathVector<T>& u) {
     auto w(v);
     return w += u;
 }
+/*
+Обычный математический вектор.
+Реализованы:
+несколько конструкторов,
++,+=(с вектором),*, *=(со скаляром),
+вывод <<
+*/
