@@ -5,23 +5,18 @@
 template<typename T>
 class Matrix {
 private:
-    std::vector<T> a;
+    std::vector<std::vector<T>> a;
     size_t n, m;
 
 public:
-    Matrix(std::vector<std::vector<T>> b) {
-        n = b.size();
+    Matrix(std::vector<std::vector<T>> b) : a(b) {
+        n = a.size();
         m = 0;
         if (n > 0) {
-            m = b[0].size();
-        }
-        for (size_t i = 0; i < n; ++i) {
-            for (size_t j = 0; j < m; ++j) {
-                a.push_back(b[i][j]);
-            }
+            m = a[0].size();
         }
     }
-    T operator[] (size_t i) const {
+    std::vector<T> operator[] (size_t i) const {
         return a[i];
     }
     std::pair<size_t, size_t> size() const {
@@ -49,24 +44,24 @@ public:
         n = b.n;
         m = b.m;
     }
-    Matrix<T> operator + (const Matrix& b) const {
-        Matrix<T> c = *this;
+    Matrix<T> operator + (const Matrix<T>& b) const {
+        Matrix<T> c = a;
         if (n == b.n && m == b.m) {
             for (size_t i = 0; i < n; i++)
                 for (size_t j = 0; j < m; j++)
-                    c.a[i * m + j] = a[i * m + j] + b.a[i * m + j];
+                    c.a[i][j] = a[i][j] + b.a[i][j];
         }
         return c;
     }
-    Matrix<T> operator+= (const Matrix& b) {
+    Matrix<T> operator+= (const Matrix<T>& b) {
         *this = *this + b;
         return *this;
     }
     Matrix<T> operator * (int b) const {
-        Matrix<T> c = *this;
+        Matrix<T> c = a;
         for (size_t i = 0; i < n; i++)
             for (size_t j = 0; j < m; j++)
-                c.a[i * m + j] = a[i * m + j] * b;
+                c.a[i][j] = a[i][j] * b;
         return c;
     }
     Matrix<T> operator*= (int b) {
@@ -80,7 +75,7 @@ public:
         for (size_t i = 0; i < n; ++i) {
             for (size_t j = 0; j < b.m; ++j) {
                 for (size_t k = 0; k < m; ++k) {
-                    c.a[i * b.m + j] += a[i * m + k] * b.a[k * b.m + j];
+                    c.a[i][j] += a[i][k] * b.a[k][j];
                 }
             }
         }
@@ -95,7 +90,7 @@ public:
         Matrix<T> c(g);
         for (size_t i = 0; i < n; i++)
             for (size_t j = 0; j < m; j++)
-                c.a[j * n + i] = a[i * m + j];
+                c.a[j][i] = a[i][j];
         return c;
     }
     Matrix<T> transpose() {
@@ -110,7 +105,7 @@ std::ostream& operator<<(std::ostream& out, const Matrix<T>& b) {
     size_t n = b.size().first, m = b.size().second;
     for (size_t i = 0; i < n; ++i) {
         for (size_t j = 0; j < m; ++j) {
-            out << b[i * m + j];
+            out << b[i][j];
             if (j != m - 1)
                 out << "\t";
         }
