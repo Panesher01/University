@@ -1,6 +1,5 @@
 #include <iostream>
 #include <vector>
-//Внизу добавлен комментарий к использованию(79 строка)
 template <typename T>
 class MathVector {
 private:
@@ -75,10 +74,3 @@ MathVector<T> operator + (const MathVector<T>& v, const MathVector<T>& u) {
     auto w(v);
     return w += u;
 }
-/*
-Обычный математический вектор.
-Реализованы:
-несколько конструкторов,
-+,+=(с вектором),*, *=(со скаляром),
-вывод <<
-*/
