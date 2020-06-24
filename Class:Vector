@@ -105,7 +105,7 @@ public:
         return *this;
     }
 
-    //базовая гарантия
+    //Basic exception guarantee
     Vector& operator = (const Vector& other) {
         if (other.sz > data.cp) {
             Vector tmp(other);
@@ -137,7 +137,7 @@ public:
         std::destroy_n(data.buf, sz);
     }
 
-    //строгая гарантия
+    //Strict exception guarantee
     void reserve(size_t n) {
         if (n > data.cp) {
             RawMemory<T> data2(n);
@@ -148,7 +148,7 @@ public:
         }
     }
 
-    //строгая гарантия
+    //Strict exception guarantee
     void resize(size_t n) {
         reserve(n);
         if (sz < n) {
@@ -161,7 +161,7 @@ public:
         sz = n;
     }
 
-    //строгая гарантия
+    //Strict exception guarantee
     void push_back(const T& elem) {
         if (sz == data.cp) {
             reserve(sz == 0 ? 1 : sz * 2);
@@ -170,7 +170,7 @@ public:
         ++sz;
     }
 
-    //строгая гарантия
+    //Strict exception guarantee
     void push_back(T&& elem) {
         if (sz == data.cp) {
             reserve(sz == 0 ? 1 : sz * 2);
