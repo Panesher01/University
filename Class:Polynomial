@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-//Внизу добавлен комментарий к использованию(306 строка)
 template<typename T>
 class Polynomial {
 private:
@@ -302,11 +301,4 @@ std::ostream& operator<<(std::ostream& out, const Polynomial<T>& b) {
     }
     return out;
 }
-/*
-Реализованы: 
-конструкторы,
-операции +, -, +=, -=, ==, !=, ,*, *=, /, %, НОД,(в том числе и с числами),
-(),[ ], Degree, begin, end,
-вывод через <<,
-оператор композиции &.
-*/
+
